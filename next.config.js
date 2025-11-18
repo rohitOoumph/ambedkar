@@ -1,0 +1,17 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  webpack: (config, { isServer }) => {
+    // Handle Three.js and related packages
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      }
+    }
+    return config
+  },
+}
+
+module.exports = nextConfig
+
