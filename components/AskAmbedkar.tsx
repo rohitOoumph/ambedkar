@@ -16,24 +16,36 @@ export default function AskAmbedkar() {
 
     const userMessage = input
     setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+    const updatedMessages = [...messages, { role: 'user' as const, content: userMessage }]
+    setMessages(updatedMessages)
     setIsTyping(true)
 
-    // Simulate AI response (replace with actual AI API call)
-    setTimeout(() => {
-      const responses = [
-        "Education is the milk of a lioness, whoever drinks it, will roar.",
-        "I like the religion that teaches liberty, equality and fraternity.",
-        "Life should be great rather than long.",
-        "Cultivation of mind should be the ultimate aim of human existence.",
-        "I measure the progress of a community by the degree of progress which women have achieved.",
-        "Be educated, be organized, and be agitated.",
-        "A great man is different from an eminent one in that he is ready to be the servant of the society.",
-      ]
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)]
-      setMessages(prev => [...prev, { role: 'assistant', content: randomResponse }])
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: updatedMessages,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI')
+      }
+
+      const data = await response.json()
+      setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+    } catch (error) {
+      console.error('Error sending message:', error)
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I encountered an error. Please try again.' 
+      }])
+    } finally {
       setIsTyping(false)
-    }, 1500)
+    }
   }
 
   return (
@@ -124,7 +136,7 @@ export default function AskAmbedkar() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Type your question..."
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-2 bg-white border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
                   onClick={handleSend}

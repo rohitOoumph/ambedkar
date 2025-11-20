@@ -1,13 +1,18 @@
 'use client'
 
 import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, BookOpen, Users, Award } from 'lucide-react'
+import { ArrowRight, BookOpen, Users, Award, Twitter, Facebook, Instagram, Linkedin, Youtube, Share2 } from 'lucide-react'
 
 export default function CTASection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const [currentUrl, setCurrentUrl] = useState('')
+
+  useEffect(() => {
+    setCurrentUrl(window.location.href)
+  }, [])
 
   const ctaCards = [
     {
@@ -83,8 +88,104 @@ export default function CTASection() {
             </motion.div>
           ))}
         </div>
+
+        {/* Social Media CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="mt-20 text-center"
+        >
+          <h3 className="text-2xl md:text-3xl font-lora font-bold mb-4">
+            Share the Legacy
+          </h3>
+          <p className="text-blue-200 mb-8 text-lg">
+            Spread awareness about Dr. Ambedkar's contributions
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            {getSocialLinks(currentUrl).map((social, index) => {
+              const handleClick = (e: React.MouseEvent) => {
+                if (social.onClick) {
+                  e.preventDefault()
+                  social.onClick()
+                }
+              }
+
+              return (
+                <motion.a
+                  key={index}
+                  href={social.href}
+                  target={social.href !== '#' ? "_blank" : undefined}
+                  rel={social.href !== '#' ? "noopener noreferrer" : undefined}
+                  onClick={handleClick}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                  transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+                  whileHover={{ scale: 1.1, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white/10 backdrop-blur-md rounded-full p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 group cursor-pointer"
+                  aria-label={social.label}
+                >
+                  <social.icon className="h-6 w-6 text-white group-hover:text-amber-400 transition-colors" />
+                </motion.a>
+              )
+            })}
+          </div>
+        </motion.div>
       </div>
     </section>
   )
+}
+
+function getSocialLinks(currentUrl: string) {
+  return [
+    {
+      icon: Twitter,
+      href: currentUrl 
+        ? `https://twitter.com/intent/tweet?text=${encodeURIComponent('Dr. B.R. Ambedkar - Architect of Modern India')}&url=${encodeURIComponent(currentUrl)}`
+        : '#',
+      label: 'Share on Twitter'
+    },
+    {
+      icon: Facebook,
+      href: currentUrl
+        ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`
+        : '#',
+      label: 'Share on Facebook'
+    },
+    {
+      icon: Linkedin,
+      href: currentUrl
+        ? `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`
+        : '#',
+      label: 'Share on LinkedIn'
+    },
+    {
+      icon: Instagram,
+      href: 'https://www.instagram.com/',
+      label: 'Follow on Instagram'
+    },
+    {
+      icon: Youtube,
+      href: 'https://www.youtube.com/',
+      label: 'Subscribe on YouTube'
+    },
+    {
+      icon: Share2,
+      href: '#',
+      label: 'Share',
+      onClick: () => {
+        if (typeof window !== 'undefined' && navigator.share) {
+          navigator.share({
+            title: 'Dr. B.R. Ambedkar - Architect of Modern India',
+            text: 'Explore the extraordinary journey of Dr. B.R. Ambedkar',
+            url: window.location.href
+          }).catch(() => {
+            // Handle share cancellation or error
+          })
+        }
+      }
+    },
+  ]
 }
 
