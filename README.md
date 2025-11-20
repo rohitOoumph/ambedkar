@@ -129,7 +129,6 @@ The "Ask Ambedkar" feature currently uses a simple response system. To integrate
 
 This project is created for educational and commemorative purposes.
 
-## Acknowledgments
+#### Acknowledgments
 
 Dedicated to Dr. B.R. Ambedkar and his vision of social justice, equality, and democracy.
-
