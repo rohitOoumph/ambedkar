@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
+import Image from 'next/image'
 import { timelineEvents } from '@/lib/ambedkar-data'
 
 export default function LifeJourneyTimeline() {
@@ -68,7 +69,7 @@ export default function LifeJourneyTimeline() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-16 md:mb-20"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-lora font-bold mb-4 text-slate-900">
@@ -90,7 +91,7 @@ export default function LifeJourneyTimeline() {
             <motion.div
               initial={{ scaleY: 0 }}
               animate={isInView ? { scaleY: 1 } : {}}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
               className="absolute top-0 left-0 right-0 bg-gradient-to-b from-blue-500 via-amber-500 to-green-500 origin-top"
               style={{ 
                 transformOrigin: 'top',
@@ -143,15 +144,15 @@ function TimelineItem({
   isInView: boolean
 }) {
   const itemRef = useRef(null)
-  const itemInView = useInView(itemRef, { once: false, margin: "-150px" })
+  const itemInView = useInView(itemRef, { once: false, margin: "-50px" })
   const isLeft = index % 2 === 0
 
   return (
     <motion.div
       ref={itemRef}
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={itemInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.15 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
       className={`relative flex items-center ${
         isLeft ? 'md:flex-row' : 'md:flex-row-reverse'
       } flex-row`}
@@ -161,13 +162,13 @@ function TimelineItem({
         <motion.div
           initial={{ scale: 0 }}
           animate={itemInView ? { scale: 1 } : {}}
-          transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
+          transition={{ duration: 0.3, delay: index * 0.05 + 0.1 }}
           className="w-6 h-6 bg-white border-4 border-blue-600 rounded-full shadow-lg relative"
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={itemInView ? { scale: 1 } : {}}
-            transition={{ duration: 0.3, delay: index * 0.15 + 0.5 }}
+            transition={{ duration: 0.2, delay: index * 0.05 + 0.15 }}
             className="absolute inset-0 bg-blue-600 rounded-full"
             style={{ scale: 0.5 }}
           />
@@ -179,48 +180,64 @@ function TimelineItem({
         isLeft ? 'md:mr-auto md:pr-12 md:text-right' : 'md:ml-auto md:pl-12 md:text-left'
       } text-left`}>
         <motion.div
-          initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
+          initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
           animate={itemInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.6, delay: index * 0.15 + 0.2 }}
-          className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100 hover:shadow-2xl transition-all duration-300 group"
+          transition={{ duration: 0.4, delay: index * 0.05 + 0.05 }}
+          className="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 hover:shadow-2xl transition-all duration-300 group"
         >
-          {/* Year Badge */}
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-4xl">{event.icon}</span>
-            <div className={`px-4 py-2 rounded-full bg-gradient-to-r ${
+          {/* Image Section */}
+          <div className="relative w-full h-64 md:h-80 overflow-hidden bg-gradient-to-br from-blue-50 to-amber-50">
+            {event.image ? (
+              <Image
+                src={event.image}
+                alt={event.title}
+                fill
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-amber-100">
+                <div className="text-6xl font-bold text-slate-300 opacity-50">{event.year}</div>
+              </div>
+            )}
+            {/* Year Badge Overlay */}
+            <div className={`absolute top-4 ${isLeft ? 'left-4' : 'right-4'} px-4 py-2 rounded-full bg-gradient-to-r ${
               index % 3 === 0 
                 ? 'from-blue-500 to-blue-600' 
                 : index % 3 === 1 
                 ? 'from-amber-500 to-amber-600' 
                 : 'from-green-500 to-green-600'
-            } text-white font-bold text-lg shadow-lg`}>
+            } text-white font-bold text-lg shadow-lg backdrop-blur-sm bg-opacity-90`}>
               {event.year}
             </div>
           </div>
 
-          {/* Title */}
-          <h3 className="text-2xl md:text-3xl font-lora font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
-            {event.title}
-          </h3>
+          {/* Content Section */}
+          <div className="p-6 md:p-8">
+            {/* Title */}
+            <h3 className="text-2xl md:text-3xl font-lora font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
+              {event.title}
+            </h3>
 
-          {/* Description */}
-          <p className="text-slate-600 text-base md:text-lg leading-relaxed">
-            {event.description}
-          </p>
+            {/* Description */}
+            <p className="text-slate-600 text-base md:text-lg leading-relaxed">
+              {event.description}
+            </p>
 
-          {/* Decorative line */}
-          <motion.div
-            initial={{ width: 0 }}
-            animate={itemInView ? { width: '100%' } : {}}
-            transition={{ duration: 0.8, delay: index * 0.15 + 0.4 }}
-            className={`mt-4 h-1 bg-gradient-to-r ${
-              index % 3 === 0 
-                ? 'from-blue-500 to-blue-600' 
-                : index % 3 === 1 
-                ? 'from-amber-500 to-amber-600' 
-                : 'from-green-500 to-green-600'
-            } rounded-full`}
-          />
+            {/* Decorative line */}
+            <motion.div
+              initial={{ width: 0 }}
+              animate={itemInView ? { width: '100%' } : {}}
+              transition={{ duration: 0.5, delay: index * 0.05 + 0.2 }}
+              className={`mt-4 h-1 bg-gradient-to-r ${
+                index % 3 === 0 
+                  ? 'from-blue-500 to-blue-600' 
+                  : index % 3 === 1 
+                  ? 'from-amber-500 to-amber-600' 
+                  : 'from-green-500 to-green-600'
+              } rounded-full`}
+            />
+          </div>
         </motion.div>
       </div>
 

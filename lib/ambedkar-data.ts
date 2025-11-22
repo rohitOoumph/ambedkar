@@ -67,49 +67,49 @@ export const timelineEvents = [
     year: 1891, 
     title: 'Born in Mhow', 
     description: 'Born into a Mahar (Dalit) family in Mhow, Central Provinces (now Madhya Pradesh)',
-    icon: "👶"
+    image: '/images/ambedkar-young.png'
   },
   { 
     year: 1913, 
     title: 'Journey to America', 
     description: 'Awarded scholarship to study at Columbia University, New York',
-    icon: "✈️"
+    image: '/images/ambedkar-columbia.png'
   },
   { 
     year: 1915, 
     title: 'MA from Columbia', 
     description: 'Earned Master of Arts in Economics, studying under renowned professors',
-    icon: "🎓"
+    image: '/images/ambedkar-student.png'
   },
   { 
     year: 1923, 
     title: 'Legal Practice', 
     description: 'Started legal practice in Mumbai, fighting for Dalit rights and social justice',
-    icon: "⚖️"
+    image: '/images/ambedkar-lawyer.png'
   },
   { 
     year: 1927, 
     title: 'Mahad Satyagraha', 
     description: 'Led historic satyagraha for Dalit water rights, burning Manusmriti',
-    icon: "🔥"
+    image: '/images/ambedkar-satyagraha.png'
   },
   { 
     year: 1947, 
     title: 'Law Minister', 
     description: 'Appointed as first Law Minister of Independent India',
-    icon: "🏛️"
+    image: '/images/ambedkar-minister.png'
   },
   { 
     year: 1950, 
     title: 'Constitution Adopted', 
     description: 'Indian Constitution came into effect, establishing democratic framework',
-    icon: "📜"
+    image: '/images/ambedkar-constitution.png'
   },
   { 
     year: 1956, 
     title: 'Eternal Legacy', 
     description: 'Passed away in Delhi, leaving an indelible mark on Indian society',
-    icon: "🌟"
+    image: '/images/ambedkar-constitution.png'
   },
 ]
 

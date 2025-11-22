@@ -1,4 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSystemPrompt } from '@/lib/ai-context'
+
+// Models that don't support system messages (must use user message instead)
+const MODELS_WITHOUT_SYSTEM_SUPPORT = [
+  'google/gemma-3n-e2b-it:free',
+  'google/gemma'
+]
+
+function formatMessagesForModel(messages: any[], systemPrompt: string, model: string) {
+  // Remove any existing system messages from user messages
+  const userMessages = messages.filter(m => m.role !== 'system')
+  
+  // Check if model supports system messages
+  const supportsSystem = !MODELS_WITHOUT_SYSTEM_SUPPORT.some(noSysModel => model.includes(noSysModel))
+  
+  if (supportsSystem) {
+    // Model supports system role - use it
+    return [
+      {
+        role: 'system',
+        content: systemPrompt
+      },
+      ...userMessages
+    ]
+  } else {
+    // Model doesn't support system role - prepend as first user message
+    return [
+      {
+        role: 'user',
+        content: systemPrompt
+      },
+      ...userMessages
+    ]
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,19 +54,54 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // Get system prompt with Ambedkar context and restrictions
+    const systemPrompt = getSystemPrompt()
+
+    // Model selection: Try Mistral first, fallback to Gemma
+    const models = [
+      'mistralai/mistral-small-3.2-24b-instruct:free',
+      'google/gemma-3n-e2b-it:free'
+    ]
+    
+    // Get preferred model from env or use first one
+    const preferredModel = process.env.OPENROUTER_MODEL || models[0]
+    const modelToUse = models.includes(preferredModel) ? preferredModel : models[0]
+
+    const headers = {
+      'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      'X-Title': process.env.NEXT_PUBLIC_SITE_NAME || 'Dr. B.R. Ambedkar - Architect of Modern India',
+      'Content-Type': 'application/json',
+    }
+
+    // Format messages for primary model
+    let messagesWithContext = formatMessagesForModel(messages, systemPrompt, modelToUse)
+
+    // Try primary model first, then fallback if it fails
+    let response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-        'X-Title': process.env.NEXT_PUBLIC_SITE_NAME || 'Dr. B.R. Ambedkar - Architect of Modern India',
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
-        model: 'google/gemma-3n-e2b-it:free',
-        messages: messages,
+        model: modelToUse,
+        messages: messagesWithContext,
       }),
     })
+
+    // If primary model fails, try fallback model
+    if (!response.ok && modelToUse === models[0]) {
+      console.warn(`Primary model ${modelToUse} failed, trying fallback model ${models[1]}`)
+      // Reformat messages for fallback model (might need different format)
+      messagesWithContext = formatMessagesForModel(messages, systemPrompt, models[1])
+      
+      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          model: models[1],
+          messages: messagesWithContext,
+        }),
+      })
+    }
 
     if (!response.ok) {
       const errorData = await response.text()

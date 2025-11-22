@@ -68,6 +68,9 @@ BR/
 │   ├── layout.tsx          # Root layout with navigation
 │   ├── page.tsx            # Homepage
 │   ├── globals.css         # Global styles
+│   ├── api/
+│   │   └── chat/
+│   │       └── route.ts    # AI chat API route
 │   ├── the-man/            # The Man section
 │   ├── the-mission/        # The Mission section
 │   └── the-legacy/         # The Legacy section
@@ -83,7 +86,9 @@ BR/
 ├── lib/
 │   ├── utils.ts            # Utility functions
 │   └── ambedkar-data.ts    # Content data
-└── public/                 # Static assets
+├── public/                 # Static assets
+├── .env.local              # Environment variables (not in git)
+└── AI_INTEGRATION.md       # AI integration documentation
 ```
 
 ## Technologies Used
@@ -119,11 +124,31 @@ Modify `tailwind.config.ts` and `app/globals.css` for custom colors and styles.
 
 ## AI Integration
 
-The "Ask Ambedkar" feature currently uses a simple response system. To integrate with a real AI API:
+The "Ask Ambedkar" feature is fully integrated with OpenRouter AI, allowing users to have real-time conversations about Dr. Ambedkar's philosophy, writings, and legacy.
 
-1. Update `components/AskAmbedkar.tsx`
-2. Replace the setTimeout logic with your AI API call
-3. Add your API key to environment variables
+**Integration Status:** ✅ Complete
+
+For detailed documentation on the AI integration, see [AI_INTEGRATION.md](./AI_INTEGRATION.md)
+
+### Quick Setup
+
+1. Create `.env.local` file in project root
+2. Add your OpenRouter API key:
+   ```bash
+   OPENROUTER_API_KEY=your-api-key-here
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   NEXT_PUBLIC_SITE_NAME=Dr. B.R. Ambedkar - Architect of Modern India
+   ```
+3. Restart the development server
+4. Click the chat button to start conversing with AI
+
+### Architecture
+
+- **Frontend:** `components/AskAmbedkar.tsx` - Chat UI component
+- **Backend:** `app/api/chat/route.ts` - Secure API route for OpenRouter
+- **Model:** `google/gemma-3n-e2b-it:free` (OpenRouter)
+
+The API key is stored securely server-side and never exposed to the browser.
 
 ## License
 

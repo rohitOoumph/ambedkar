@@ -4,6 +4,7 @@ import LifeJourneyTimeline from '@/components/LifeJourneyTimeline'
 import ImpactStats from '@/components/ImpactStats'
 import AchievementsShowcase from '@/components/AchievementsShowcase'
 import PrinciplesSection from '@/components/PrinciplesSection'
+import PledgeSection from '@/components/PledgeSection'
 import CTASection from '@/components/CTASection'
 
 export default function Home() {
@@ -26,6 +27,9 @@ export default function Home() {
 
       {/* Core Principles */}
       <PrinciplesSection />
+
+      {/* Pledge Section */}
+      <PledgeSection />
 
       {/* Call to Action */}
       <CTASection />
